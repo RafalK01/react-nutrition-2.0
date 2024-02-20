@@ -1,25 +1,65 @@
-import logo from './logo.svg';
 import './App.css';
+import foods from "./foods.json"
+import { useState } from 'react'
+import FoodBox from './components/FoodBox';
+import AddFoodForm from './components/AddFoodForm';
+import Search from './components/Search';
 
-function App() {
+
+function App () {
+
+  let [ foodItems, setFoodItems ] = useState(foods)
+  let [ food, setFood ] = useState(foods)
+
+  function addNewFood(newFood) {
+    const updatedFoodItems = [newFood, ...foodItems]
+    const updatedFood = [...food, newFood]
+
+    setFoodItems(updatedFoodItems)
+    setFood(updatedFood)
+
+  }
+
+  function search(query) {
+    console.log(query)
+
+    const searchResult = foodItems.filter(foodItem => {
+      const nameChars = foodItem.name.toLowerCase().split('').sort()
+      const queryChars = query.toLowerCase().split('').sort()
+      return queryChars.every(char => nameChars.includes(char))
+    })
+
+    setFood(searchResult)
+  }
+
+  function handleDelete(foodToDelete){
+    const filteredFoodItems = foodItems.filter(foodItem => {
+      return foodItem.name !== foodToDelete
+    })
+
+    const filteredFood = food.filter(foodItem => {
+      return foodItem.name !== foodToDelete
+    })
+
+    setFoodItems(filteredFoodItems)
+    setFood(filteredFood)
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <AddFoodForm addFood={addNewFood}/>
+      <Search search={search}/>
+      <div className="App">
+        {food.map(item => {
+          return (
+            <div>
+              <FoodBox food = {item} handleDelete={handleDelete}/>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
-
 export default App;
